@@ -1,0 +1,9 @@
+---
+
+- name: add supervisord config
+  template: src=files/audiokitt.supervisord.conf
+            dest=/etc/supervisor/conf.d/audiokitt.conf
+
+- name: restart supervisord processes
+  supervisorctl: name='audiokitt:' state=restarted
+  changed_when: false

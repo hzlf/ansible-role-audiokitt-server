@@ -1,0 +1,43 @@
+---
+
+# users & groups
+- name: create group
+  group: name={{ audiokitt_group }} state=present gid={{ audiokitt_gid }}
+
+- name: create user
+  user: name={{ audiokitt_user }}
+        shell=/bin/bash
+        uid={{ audiokitt_uid }}
+        group={{ audiokitt_group }}
+        groups="sudo"
+
+- name: create log directory
+  file: path={{ audiokitt_log_directory }} state=directory
+
+- include: packages.yml
+  tags: audiokitt-packages
+  become: yes
+
+- include: install-essentia.yml
+  tags: audiokitt-essentia
+  become: yes
+
+- include: install-server.yml
+  tags: audiokitt-server
+  become: yes
+  environment:
+      SETTINGS_PATH: "/etc/audiokitt/application-settings.py"
+
+- include: install-services.yml
+  tags: audiokitt-services
+  become: yes
+
+- include: install-postgresql.yml
+  tags: audiokitt-postgresql
+  become: yes
+  when: "{{ audiokitt_include_postgresql }}"
+
+- include: install-nginx.yml
+  tags: audiokitt-nginx
+  become: yes
+  when: "{{ audiokitt_include_nginx }}"

@@ -1,0 +1,43 @@
+---
+
+audiokitt_user: audiokitt
+audiokitt_uid: 2000
+audiokitt_group: audiokitt
+audiokitt_gid: 2000
+
+audiokitt_server_git_repository: https://github.com/hzlf/django-audiokitt.git
+audiokitt_server_git_version: master
+
+audiokitt_essentia_git_repository: https://github.com/MTG/essentia.git
+# version suggested:
+# http://essentia.upf.edu/documentation/installing.html#compiling-essentia
+# audiokitt_essentia_git_version: v2.1_beta2
+audiokitt_essentia_git_version: master
+
+# hostname (likely an f.q.d.n)
+#
+audiokitt_hostname: audiokitt.local
+audiokitt_server_public_ip: '{{ ansible_eth0.ipv4.address }}'
+
+audiokitt_install_directory: /srv/audiokitt
+audiokitt_log_directory: /var/log/audiokitt
+
+audiokitt_essentia_directory: /root/src/essentia
+
+audiokitt_db_name: audiokitt
+audiokitt_db_username: audiokitt
+audiokitt_db_password: audiokitt
+audiokitt_db_host: localhost
+audiokitt_db_port: ''
+
+audiokitt_server_secret_key: "***"
+
+# install local nginx instance
+# disable if you want to configure a reverse-proxy throgh another/existing webserver
+#
+audiokitt_include_nginx: yes
+
+# install local postgresql instance
+# disable if you want to configure another/existing database
+#
+audiokitt_include_postgresql: yes

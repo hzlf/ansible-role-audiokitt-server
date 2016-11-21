@@ -1,0 +1,24 @@
+---
+
+- name: install nginx package
+  apt: pkg=nginx state=present
+  tags: packages
+
+- name: ensure nginx default host is absent
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+
+- name: nginx maintenance static directory
+  file: path={{ audiokitt_install_directory }}/maintenance-static/ state=directory
+
+- name: nginx maintenance static site
+  template: src=files/5xx.html
+            dest={{ audiokitt_install_directory }}/maintenance-static/5xx.html
+
+- name: add nginx config
+  template: src=files/audiokitt.nginx.conf
+            dest=/etc/nginx/sites-enabled/audiokitt.conf
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  changed_when: false

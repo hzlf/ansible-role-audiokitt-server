@@ -1,0 +1,40 @@
+---
+
+# TODO: there must be a more elegant way...
+- name: check if essentia toolkit is installed.
+  stat: path=/usr/local/lib/libessentia.a
+  register: essentia_installed
+
+- name: create essentia workspace directory
+  file: path={{ audiokitt_essentia_directory }} state=directory
+
+- name: chekout essentia toolkit repository from github
+  git: repo={{ audiokitt_essentia_git_repository }}
+       dest={{ audiokitt_essentia_directory }}
+       version={{ audiokitt_essentia_git_version }}
+       depth=1
+       accept_hostkey=yes
+       force=yes
+  register: essentia_repo
+
+- name: configure essentia toolkit
+  command: >
+    ./waf configure --mode=release --with-python --build-static
+    chdir={{ audiokitt_essentia_directory  }}
+  become: yes
+  when: essentia_installed.stat.exists == False or essentia_repo.changed
+
+- name: build essentia toolkit
+  command: >
+    ./waf
+    chdir={{ audiokitt_essentia_directory  }}
+  become: yes
+  when: essentia_installed.stat.exists == False or essentia_repo.changed
+
+- name: install essentia toolkit
+  command: >
+    ./waf install
+    chdir={{ audiokitt_essentia_directory  }}
+  become: yes
+  when: essentia_installed.stat.exists == False or essentia_repo.changed
+

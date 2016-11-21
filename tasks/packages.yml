@@ -1,0 +1,59 @@
+---
+
+#- name: ensure deb-multimedia-keyring is installed
+#  apt: pkg=deb-multimedia-keyring state=present
+#
+#- name: add deb-multimedia apt repository
+#  apt_repository: repo='deb http://www.deb-multimedia.org {{ ansible_distribution_release }} main non-free' state=present
+#
+#- name: add deb-multimedia src apt repository
+#  apt_repository: repo='deb-src http://www.deb-multimedia.org {{ ansible_distribution_release }} main non-free' state=present
+
+
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+  tags: packages
+
+- name: ensure git-core is installed
+  apt: pkg=git-core state=present
+
+- name: ensure build-essential is installed
+  apt: pkg=build-essential state=present
+
+- name: ensure memcached is installed
+  apt: pkg=memcached state=present
+
+- name: ensure redis-server is installed
+  apt: pkg=redis-server state=present
+
+- name: ensure essentia project dependencies are installed
+  apt: "pkg={{ item }} state=present"
+  with_items:
+    - libyaml-dev
+    - libfftw3-dev
+    - libavcodec-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libavresample-dev
+    - libsndfile-dev
+    - python-dev
+    - libpq-dev
+    - libsamplerate0-dev
+    - libtag1-dev
+    - python-numpy-dev
+    - python-yaml
+    - libjpeg-dev
+    - zlib1g-dev
+    - libmagick-dev
+    # - ffmpeg
+  tags: packages
+  changed_when: False
+
+- name: Ensure pip is installed
+  easy_install: name=pip
+
+- name: Ensure virtualenv is installed
+  easy_install: name=virtualenv
+
+
+

@@ -1,0 +1,58 @@
+---
+
+- name: chekout django-audiokitt repository
+  git: repo={{ audiokitt_server_git_repository }}
+       dest={{ audiokitt_install_directory }}
+       version={{ audiokitt_server_git_version }}
+       depth=1
+       accept_hostkey=yes
+       force=yes
+  register: audiokitt_repository
+
+
+
+- name: pip install numpy first
+  pip: virtualenv={{ audiokitt_install_directory }}/env
+       name=numpy
+
+###
+# essentia install does not currently work with virtualenv.
+# so we need to manually copy form system *site-packages*
+# /usr/local/lib/python2.7/dist-packages/essentia to:
+#
+
+- name: install essentia toolkit
+  command: >
+    cp -Rp /usr/local/lib/python2.7/dist-packages/essentia {{ audiokitt_install_directory }}/env/lib/python2.7/site-packages/
+  become: yes
+
+
+- name: Configure virtualenv with requirements
+  pip: virtualenv={{ audiokitt_install_directory }}/env
+       requirements={{ audiokitt_install_directory }}/app/requirements/requirements.txt
+
+- name: create media directory
+  file: path={{ audiokitt_install_directory }}/app/media state=directory
+
+- name: create config directory
+  file: path=/etc/audiokitt state=directory
+
+- name: add django settings file
+  template: src=files/application-settings.py
+            dest=/etc/audiokitt/application-settings.py
+
+- django_manage: >
+      command=migrate
+      app_path={{ audiokitt_install_directory }}/app/
+      settings=project.settings
+      virtualenv={{ audiokitt_install_directory }}/env
+  environment:
+      SETTINGS_PATH: "/etc/audiokitt/application-settings.py"
+
+- django_manage: >
+      command=collectstatic
+      app_path={{ audiokitt_install_directory }}/app/
+      settings=project.settings
+      virtualenv={{ audiokitt_install_directory }}/env
+  environment:
+      SETTINGS_PATH: "/etc/audiokitt/application-settings.py"
